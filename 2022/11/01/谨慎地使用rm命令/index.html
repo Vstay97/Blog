@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/Blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/Blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/Blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/Blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/Blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha256-AbA177XfpSnFEvgpYu1jMygiLabzPCJCRIBtR5jGc0k=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pace/1.2.4/themes/blue/pace-theme-minimal.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"vstay97.github.io","root":"/Blog/","images":"/Blog/images","scheme":"Gemini","darkmode":false,"version":"8.13.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":"flat"},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/Blog/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true}}</script><script src="/Blog/js/config.js"></script>
+
+    <meta name="description" content="这几天把一个巨大的数据库删了两次, 导致很多任务都delay.  在此保证 : 以后所有的 rm、delete、remove操作, 一定谨慎谨慎再谨慎! 除了心理上的重视, 不禁要问一句 有没有什么方式能在系统操作的层面来避免 rm -rf 造成无法挽回的事故呢? 那就是”垃圾箱”, 哈哈哈 将文件移动到“垃圾桶”是一个好主意，当你无意中运行 rm 命令时，可以拯救你；但是很少有人会说这是一个坏习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用rm,但是丢到trash">
+<meta property="og:url" content="https://vstay97.github.io/Blog/2022/11/01/%E8%B0%A8%E6%85%8E%E5%9C%B0%E4%BD%BF%E7%94%A8rm%E5%91%BD%E4%BB%A4/index.html">
+<meta property="og:site_name" content="Milky Way Galaxy">
+<meta property="og:description" content="这几天把一个巨大的数据库删了两次, 导致很多任务都delay.  在此保证 : 以后所有的 rm、delete、remove操作, 一定谨慎谨慎再谨慎! 除了心理上的重视, 不禁要问一句 有没有什么方式能在系统操作的层面来避免 rm -rf 造成无法挽回的事故呢? 那就是”垃圾箱”, 哈哈哈 将文件移动到“垃圾桶”是一个好主意，当你无意中运行 rm 命令时，可以拯救你；但是很少有人会说这是一个坏习">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-11-01T03:26:21.000Z">
+<meta property="article:modified_time" content="2022-11-01T03:26:21.000Z">
+<meta property="article:author" content="Vstay">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://vstay97.github.io/Blog/2022/11/01/%E8%B0%A8%E6%85%8E%E5%9C%B0%E4%BD%BF%E7%94%A8rm%E5%91%BD%E4%BB%A4/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://vstay97.github.io/Blog/2022/11/01/%E8%B0%A8%E6%85%8E%E5%9C%B0%E4%BD%BF%E7%94%A8rm%E5%91%BD%E4%BB%A4/","path":"2022/11/01/谨慎地使用rm命令/","title":"使用rm,但是丢到trash"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>使用rm,但是丢到trash | Milky Way Galaxy</title>
+  
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/Blog/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/Blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Milky Way Galaxy</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">To be,or not to be</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/Blog/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/Blog/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/Blog/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/Blog/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/Blog/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Vstay"
+      src="/Blog/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">Vstay</p>
+  <div class="site-description" itemprop="description">Sometimes coding,Sometimes thinking</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/Blog/archives/">
+          <span class="site-state-item-count">72</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/Blog/categories/">
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/Blog/tags/">
+        <span class="site-state-item-count">97</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Vstay97" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Vstay97" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:vstay@qq.com" title="E-Mail → mailto:vstay@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll site-overview-item animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-user-friends fa-fw"></i>
+      Friends
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://junjieblog.com/" title="https:&#x2F;&#x2F;junjieblog.com&#x2F;" rel="noopener" target="_blank">Rover's Blog</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.zhihu.com/people/o-shui-ge-er" title="https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;o-shui-ge-er" rel="noopener" target="_blank">水歌儿's Zhihu</a>
+        </li>
+    </ul>
+  </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/Vstay97" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://vstay97.github.io/Blog/2022/11/01/%E8%B0%A8%E6%85%8E%E5%9C%B0%E4%BD%BF%E7%94%A8rm%E5%91%BD%E4%BB%A4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/Blog/uploads/avatar.png">
+      <meta itemprop="name" content="Vstay">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Milky Way Galaxy">
+      <meta itemprop="description" content="Sometimes coding,Sometimes thinking">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="使用rm,但是丢到trash | Milky Way Galaxy">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用rm,但是丢到trash
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-11-01 11:26:21" itemprop="dateCreated datePublished" datetime="2022-11-01T11:26:21+08:00">2022-11-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/Blog/categories/%E5%A4%87%E5%BF%98%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">备忘录</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>8.5k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>8 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>这几天把一个巨大的数据库删了两次, 导致很多任务都delay. </p>
+<p>在此保证 : 以后所有的 rm、delete、remove操作, 一定谨慎谨慎再谨慎!</p>
+<p>除了心理上的重视, 不禁要问一句 有没有什么方式能在系统操作的层面来避免 <code>rm -rf</code> 造成无法挽回的事故呢? 那就是”垃圾箱”, 哈哈哈</p>
+<p>将文件移动到“垃圾桶”是一个好主意，当你无意中运行 rm 命令时，可以拯救你；但是很少有人会说这是一个坏习惯，如果你不注意“垃圾桶”，它可能会在一定的时间内被文件和文件夹堆积起来。在这种情况下，我建议你按照你的意愿去做一个定时任务。</p>
+<p>下面提供一个Linux下的trash脚本</p>
+<span id="more"></span>
+
+<p><code>saferm.sh</code>: </p>
+<ul>
+<li>这适用于服务器和桌面两种环境</li>
+<li>如果脚本检测到 GNOME 、KDE、Unity 或 LXDE 桌面环境（DE），则它将文件或文件夹安全地移动到默认垃圾箱<code>$HOME/.local/share/Trash/files</code></li>
+<li>否则会在您的主目录中创建垃圾箱文件夹 <code>$HOME/Trash</code></li>
+<li>通过更改<code>trash_desktops</code>或<code>trash_fallback</code> 参数来决定垃圾桶的位置 :)</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="language-bash">!/bin/bash</span></span><br><span class="line"><span class="meta">#</span><span class="language-bash"><span class="comment">#</span></span></span><br><span class="line"><span class="meta">#</span><span class="language-bash"><span class="comment"># saferm.sh</span></span></span><br><span class="line"><span class="meta">#</span><span class="language-bash"><span class="comment"># Safely remove files, moving them to GNOME/KDE trash instead of deleting.</span></span></span><br><span class="line"><span class="meta">#</span><span class="language-bash"><span class="comment">#</span></span></span><br><span class="line"></span><br><span class="line">version=&quot;1.16&quot;;</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="language-bash"><span class="comment"># flags (change these to change default behaviour)</span></span></span><br><span class="line">recursive=&quot;&quot; # do not recurse into directories by default</span><br><span class="line">verbose=&quot;true&quot; # set verbose by default for inexperienced users.</span><br><span class="line">force=&quot;&quot; #disallow deleting special files by default</span><br><span class="line">unsafe=&quot;&quot; # do not behave like regular rm by default</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="language-bash"><span class="comment"># possible flags (recursive, verbose, force, unsafe)</span></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">don<span class="string">&#x27;t touch this unless you want to create/destroy flags</span></span></span><br><span class="line">flaglist=&quot;r v f u q&quot;</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash"><span class="string">Colours</span></span></span><br><span class="line">blue=&#x27;\e[1;34m&#x27;</span><br><span class="line">red=&#x27;\e[1;31m&#x27;</span><br><span class="line">norm=&#x27;\e[0m&#x27;</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="language-bash"><span class="string"># trashbin definitions</span></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash"><span class="string">this is the same for newer KDE and GNOME:</span></span></span><br><span class="line">trash_desktops=&quot;$HOME/.local/share/Trash/files&quot;</span><br><span class="line"><span class="meta"># </span><span class="language-bash"><span class="string">if neither is running:</span></span></span><br><span class="line">trash_fallback=&quot;$HOME/Trash&quot;</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash"><span class="string">use .local/share/Trash?</span></span></span><br><span class="line">use_desktop=$( ps -U $USER | grep -E &quot;gnome-settings|startkde|mate-session|mate-settings|mate-panel|gnome-shell|lxsession|unity|xfwm4&quot; )</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash"><span class="string">mounted filesystems, for avoiding cross-device move on safe delete</span></span></span><br><span class="line">filesystems=$( mount | awk &#x27;&#123;print $3; &#125;&#x27; )</span><br><span class="line"></span><br><span class="line">if [ -n &quot;$use_desktop&quot; ]; then</span><br><span class="line">    trash=&quot;$&#123;trash_desktops&#125;&quot;</span><br><span class="line">    infodir=&quot;$&#123;trash&#125;/../info&quot;;</span><br><span class="line">    for k in &quot;$&#123;trash&#125;&quot; &quot;$&#123;infodir&#125;&quot;; do</span><br><span class="line">        if [ ! -d &quot;$&#123;k&#125;&quot; ]; then mkdir -p &quot;$&#123;k&#125;&quot;; fi</span><br><span class="line">    done</span><br><span class="line">else</span><br><span class="line">    trash=&quot;$&#123;trash_fallback&#125;&quot;</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">usagemessage() &#123;</span><br><span class="line">	echo -e &quot;This is $&#123;blue&#125;saferm.sh$norm $version. LXDE and Gnome3 detection.</span><br><span class="line">    Will ask to unsafe-delete instead of cross-fs move. Allows unsafe (regular rm) delete (ignores trashinfo).</span><br><span class="line">    Creates trash and trashinfo directories if they do not exist. Handles symbolic link deletion.</span><br><span class="line">    Does not complain about different user any more.\n&quot;;</span><br><span class="line">	echo -e &quot;Usage: $&#123;blue&#125;/path/to/saferm.sh$norm [$&#123;blue&#125;OPTIONS$norm] [$blue--$norm] $&#123;blue&#125;files and dirs to safely remove$norm&quot;</span><br><span class="line">	echo -e &quot;$&#123;blue&#125;OPTIONS$norm:&quot;</span><br><span class="line">	echo -e &quot;$blue-r$norm      allows recursively removing directories.&quot;</span><br><span class="line">	echo -e &quot;$blue-f$norm      Allow deleting special files (devices, ...).&quot;</span><br><span class="line">  echo -e &quot;$blue-u$norm      Unsafe mode, bypass trash and delete files permanently.&quot;</span><br><span class="line">	echo -e &quot;$blue-v$norm      Verbose, prints more messages. Default in this version.&quot;</span><br><span class="line">  echo -e &quot;$blue-q$norm      Quiet mode. Opposite of verbose.&quot;</span><br><span class="line">	echo &quot;&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">detect() &#123;</span><br><span class="line">    if [ ! -e &quot;$1&quot; ]; then fs=&quot;&quot;; return; fi</span><br><span class="line">    path=$(readlink -f &quot;$1&quot;)</span><br><span class="line">    for det in $filesystems; do</span><br><span class="line">        match=$( echo &quot;$path&quot; | grep -oE &quot;^$det&quot; )</span><br><span class="line">        if [ -n &quot;$match&quot; ]; then</span><br><span class="line">            if [ $&#123;#det&#125; -gt $&#123;#fs&#125; ]; then</span><br><span class="line">                fs=&quot;$det&quot;</span><br><span class="line">            fi</span><br><span class="line">        fi</span><br><span class="line">    done</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">trashinfo() &#123;</span><br><span class="line"><span class="meta">#</span><span class="language-bash"><span class="string">gnome: generate trashinfo:</span></span></span><br><span class="line">	bname=$( basename -- &quot;$1&quot; )</span><br><span class="line">    fname=&quot;$&#123;trash&#125;/../info/$&#123;bname&#125;.trashinfo&quot;</span><br><span class="line">    cat &lt;&lt;EOF &gt; &quot;$&#123;fname&#125;&quot;</span><br><span class="line">[Trash Info]</span><br><span class="line">Path=$PWD/$&#123;1&#125;</span><br><span class="line">DeletionDate=$( date +%Y-%m-%dT%H:%M:%S )</span><br><span class="line">EOF</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">setflags() &#123;</span><br><span class="line">    for k in $flaglist; do</span><br><span class="line">	reduced=$( echo &quot;$1&quot; | sed &quot;s/$k//&quot; )</span><br><span class="line">	if [ &quot;$reduced&quot; != &quot;$1&quot; ]; then</span><br><span class="line">	    flags_set=&quot;$flags_set $k&quot;</span><br><span class="line">	fi</span><br><span class="line">    done</span><br><span class="line">  for k in $flags_set; do</span><br><span class="line">	if [ &quot;$k&quot; == &quot;v&quot; ]; then</span><br><span class="line">	    verbose=&quot;true&quot;</span><br><span class="line">	elif [ &quot;$k&quot; == &quot;r&quot; ]; then </span><br><span class="line">	    recursive=&quot;true&quot;</span><br><span class="line">	elif [ &quot;$k&quot; == &quot;f&quot; ]; then </span><br><span class="line">	    force=&quot;true&quot;</span><br><span class="line">	elif [ &quot;$k&quot; == &quot;u&quot; ]; then </span><br><span class="line">	    unsafe=&quot;true&quot;</span><br><span class="line">	elif [ &quot;$k&quot; == &quot;q&quot; ]; then </span><br><span class="line">    unset verbose</span><br><span class="line">	fi</span><br><span class="line">  done</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">performdelete() &#123;</span><br><span class="line"><span class="meta">			# </span><span class="language-bash"><span class="string">&quot;delete&quot; = move to trash</span></span></span><br><span class="line">			if [ -n &quot;$unsafe&quot; ]</span><br><span class="line">			then</span><br><span class="line">			  if [ -n &quot;$verbose&quot; ];then echo -e &quot;Deleting $red$1$norm&quot;; fi</span><br><span class="line">		    #UNSAFE: permanently remove files.</span><br><span class="line">		    rm -rf -- &quot;$1&quot;</span><br><span class="line">			else</span><br><span class="line">			  if [ -n &quot;$verbose&quot; ];then echo -e &quot;Moving $blue$k$norm to $red$&#123;trash&#125;$norm&quot;; fi</span><br><span class="line">		    mv -b -- &quot;$1&quot; &quot;$&#123;trash&#125;&quot; # moves and backs up old files</span><br><span class="line">			fi</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">askfs() &#123;</span><br><span class="line">  detect &quot;$1&quot;</span><br><span class="line">  if [ &quot;$&#123;fs&#125;&quot; != &quot;$&#123;tfs&#125;&quot; ]; then</span><br><span class="line">    unset answer;</span><br><span class="line">    until [ &quot;$answer&quot; == &quot;y&quot; -o &quot;$answer&quot; == &quot;n&quot; ]; do</span><br><span class="line">      echo -e &quot;$blue$1$norm is on $blue$&#123;fs&#125;$norm. Unsafe delete (y/n)?&quot;</span><br><span class="line">      read -n 1 answer;</span><br><span class="line">    done</span><br><span class="line">    if [ &quot;$answer&quot; == &quot;y&quot; ]; then</span><br><span class="line">      unsafe=&quot;yes&quot;</span><br><span class="line">    fi</span><br><span class="line">  fi</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">complain() &#123;</span><br><span class="line">  msg=&quot;&quot;</span><br><span class="line">  if [ ! -e &quot;$1&quot; -a ! -L &quot;$1&quot; ]; then # does not exist</span><br><span class="line">    msg=&quot;File does not exist:&quot;</span><br><span class="line">	elif [ ! -w &quot;$1&quot; -a ! -L &quot;$1&quot; ]; then # not writable</span><br><span class="line">    msg=&quot;File is not writable:&quot;</span><br><span class="line">	elif [ ! -f &quot;$1&quot; -a ! -d &quot;$1&quot; -a -z &quot;$force&quot; ]; then # Special or sth else.</span><br><span class="line">    	msg=&quot;Is not a regular file or directory (and -f not specified):&quot;</span><br><span class="line">	elif [ -f &quot;$1&quot; ]; then # is a file</span><br><span class="line">    act=&quot;true&quot; # operate on files by default</span><br><span class="line">	elif [ -d &quot;$1&quot; -a -n &quot;$recursive&quot; ]; then # is a directory and recursive is enabled</span><br><span class="line">    act=&quot;true&quot;</span><br><span class="line">	elif [ -d &quot;$1&quot; -a -z &quot;$&#123;recursive&#125;&quot; ]; then</span><br><span class="line">		msg=&quot;Is a directory (and -r not specified):&quot;</span><br><span class="line">	else</span><br><span class="line"><span class="meta">		# </span><span class="language-bash"><span class="string">not file or dir. This branch should not be reached.</span></span></span><br><span class="line">		msg=&quot;No such file or directory:&quot;</span><br><span class="line">	fi</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">asknobackup() &#123;</span><br><span class="line">  unset answer</span><br><span class="line">	until [ &quot;$answer&quot; == &quot;y&quot; -o &quot;$answer&quot; == &quot;n&quot; ]; do</span><br><span class="line">	  echo -e &quot;$blue$k$norm could not be moved to trash. Unsafe delete (y/n)?&quot;</span><br><span class="line">	  read -n 1 answer</span><br><span class="line">	done</span><br><span class="line">	if [ &quot;$answer&quot; == &quot;y&quot; ]</span><br><span class="line">	then</span><br><span class="line">	  unsafe=&quot;yes&quot;</span><br><span class="line">	  performdelete &quot;$&#123;k&#125;&quot;</span><br><span class="line">	  ret=$?</span><br><span class="line"><span class="meta">		# </span><span class="language-bash"><span class="string">Reset temporary unsafe flag</span></span></span><br><span class="line">	  unset unsafe</span><br><span class="line">	  unset answer</span><br><span class="line">	else</span><br><span class="line">	  unset answer</span><br><span class="line">	fi</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">deletefiles() &#123;</span><br><span class="line">  for k in &quot;$@&quot;; do</span><br><span class="line">	  fdesc=&quot;$blue$k$norm&quot;;</span><br><span class="line">	  complain &quot;$&#123;k&#125;&quot;</span><br><span class="line">	  if [ -n &quot;$msg&quot; ]</span><br><span class="line">	  then</span><br><span class="line">		  echo -e &quot;$msg $fdesc.&quot;</span><br><span class="line">    else</span><br><span class="line">    	#actual action:</span><br><span class="line">    	if [ -z &quot;$unsafe&quot; ]; then</span><br><span class="line">    	  askfs &quot;$&#123;k&#125;&quot;</span><br><span class="line">    	fi</span><br><span class="line">		  performdelete &quot;$&#123;k&#125;&quot;</span><br><span class="line">		  ret=$?</span><br><span class="line">		  # Reset temporary unsafe flag</span><br><span class="line">		  if [ &quot;$answer&quot; == &quot;y&quot; ]; then unset unsafe; unset answer; fi</span><br><span class="line">      #echo &quot;MV exit status: $ret&quot;</span><br><span class="line">      if [ ! &quot;$ret&quot; -eq 0 ]</span><br><span class="line">      then </span><br><span class="line">        asknobackup &quot;$&#123;k&#125;&quot;</span><br><span class="line">      fi</span><br><span class="line">      if [ -n &quot;$use_desktop&quot; ]; then</span><br><span class="line">          # generate trashinfo for desktop environments</span><br><span class="line">        trashinfo &quot;$&#123;k&#125;&quot;</span><br><span class="line">      fi</span><br><span class="line">    fi</span><br><span class="line">	done</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash"><span class="string">Make trash if it doesn&#x27;</span>t exist</span></span><br><span class="line">if [ ! -d &quot;$&#123;trash&#125;&quot; ]; then</span><br><span class="line">    mkdir &quot;$&#123;trash&#125;&quot;;</span><br><span class="line">fi</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">find out <span class="built_in">which</span> flags were given</span></span><br><span class="line">afteropts=&quot;&quot;; # boolean for end-of-options reached</span><br><span class="line">for k in &quot;$@&quot;; do</span><br><span class="line"><span class="meta">	# </span><span class="language-bash"><span class="keyword">if</span> starts with dash and before end of options marker (--)</span></span><br><span class="line">	if [ &quot;$&#123;k:0:1&#125;&quot; == &quot;-&quot; -a -z &quot;$afteropts&quot; ]; then</span><br><span class="line">		if [ &quot;$&#123;k:1:2&#125;&quot; == &quot;-&quot; ]; then # if end of options marker</span><br><span class="line">			afteropts=&quot;true&quot;</span><br><span class="line">		else # option(s)</span><br><span class="line">    		    setflags &quot;$k&quot; # set flags</span><br><span class="line">    	        fi</span><br><span class="line">	else # not starting with dash, or after end-of-opts</span><br><span class="line">		files[++i]=&quot;$k&quot;</span><br><span class="line">	fi</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">if [ -z &quot;$&#123;files[1]&#125;&quot; ]; then # no parameters?</span><br><span class="line">	usagemessage # tell them how to use this</span><br><span class="line">	exit 0;</span><br><span class="line">fi</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash">Which fs is trash on?</span></span><br><span class="line">detect &quot;$&#123;trash&#125;&quot;</span><br><span class="line">tfs=&quot;$fs&quot;</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"># </span><span class="language-bash"><span class="keyword">do</span> the work</span></span><br><span class="line">deletefiles &quot;$&#123;files[@]&#125;&quot;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>步骤:</p>
+<ol>
+<li><p>给脚本添加执行权限</p>
+<p><code>chmod 755 saferm.sh</code></p>
+</li>
+<li><p>在<code>.bashrc</code>文件中设置别名</p>
+<p>xxx为脚本的路径</p>
+<p><code>alias rm=xxxx/xxxx/.saferm.sh</code></p>
+</li>
+<li><p>刷新<code>bash</code>生效</p>
+<p><code>source ~/.bashrc</code></p>
+</li>
+</ol>
+<p>一切就绪，现在你可以执行 rm 命令，自动将文件移动到”垃圾桶”，而不是永久删除它们。</p>
+<p>要了解<code>saferm.sh</code>的其他选项，请查看帮助。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$ </span><span class="language-bash">saferm.sh -h</span></span><br><span class="line">This is saferm.sh 1.16. LXDE and Gnome3 detection.</span><br><span class="line">Will ask to unsafe-delete instead of cross-fs move. Allows unsafe (regular rm) delete (ignores trashinfo).</span><br><span class="line">Creates trash and trashinfo directories if they do not exist. Handles symbolic link deletion.</span><br><span class="line">Does not complain about different user any more.</span><br><span class="line"></span><br><span class="line">Usage: /path/to/saferm.sh [OPTIONS] [--] files and dirs to safely remove</span><br><span class="line">OPTIONS:</span><br><span class="line">-r      allows recursively removing directories.</span><br><span class="line">-f      Allow deleting special files (devices, ...).</span><br><span class="line">-u      Unsafe mode, bypass trash and delete files permanently.</span><br><span class="line">-v      Verbose, prints more messages. Default in this version.</span><br><span class="line">-q      Quiet mode. Opposite of verbose.</span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>脚本地址: <a target="_blank" rel="noopener" href="https://github.com/lagerspetz/linux-stuff/blob/master/scripts/saferm.sh">https://github.com/lagerspetz/linux-stuff/blob/master/scripts/saferm.sh</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+      
+
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Vstay
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://vstay97.github.io/Blog/2022/11/01/%E8%B0%A8%E6%85%8E%E5%9C%B0%E4%BD%BF%E7%94%A8rm%E5%91%BD%E4%BB%A4/" title="使用rm,但是丢到trash">https://vstay97.github.io/Blog/2022/11/01/谨慎地使用rm命令/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/Blog/tags/linux/" rel="tag"><i class="fa fa-tag"></i> linux</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/Blog/2022/10/18/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E9%85%8D%E7%BD%AE%E5%85%A8%E6%94%BB%E7%95%A5/" rel="prev" title="Linux环境变量配置全攻略">
+                  <i class="fa fa-chevron-left"></i> Linux环境变量配置全攻略
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/Blog/2022/11/03/%E5%A6%82%E4%BD%95%E5%9C%A8Python%E4%BB%BB%E5%8A%A1%E7%BB%93%E6%9D%9F%E5%90%8E%E7%BB%99%E8%87%AA%E5%B7%B1%E5%8F%91%E9%82%AE%E4%BB%B6/" rel="next" title="如何在Python任务结束后给自己发邮件">
+                  如何在Python任务结束后给自己发邮件 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">陕ICP备16015358号-1 </a>
+  </div>
+
+<div class="copyright">
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Vstay</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">909k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">13:46</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div><script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+    </div>
+  </footer>
+
+  
+  <script size="300" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/Blog/js/comments.js"></script><script src="/Blog/js/utils.js"></script><script src="/Blog/js/motion.js"></script><script src="/Blog/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/Blog/js/third-party/search/local-search.js"></script>
+
+
+  <script class="next-config" data-name="mermaid" type="application/json">{"enable":true,"theme":{"light":"default","dark":"dark"},"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mermaid/9.1.7/mermaid.min.js","integrity":"sha256-G58AID1YoX5YaEtWfXSI0VLrZ6N4kvNvwg0BI8zUFxE="}}</script>
+  <script src="/Blog/js/third-party/tags/mermaid.js"></script>
+
+
+  <script src="/Blog/js/third-party/pace.js"></script>
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
